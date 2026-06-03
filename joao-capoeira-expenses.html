@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Joao's Capoeira Event — Expenses</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0f0e17;
+    --surface: #1a1828;
+    --surface2: #221f35;
+    --border: #2e2a45;
+    --border-light: #252240;
+    --text: #fffffe;
+    --text-muted: #a09dc0;
+    --text-faint: #5a5778;
+
+    --yellow: #f9c846;
+    --yellow-dark: #b8920a;
+    --yellow-bg: #2a2410;
+
+    --pink: #ff6b9d;
+    --pink-dark: #c0326a;
+    --pink-bg: #2a1020;
+
+    --teal: #43ffdd;
+    --teal-dark: #0a9e80;
+    --teal-bg: #0a2420;
+
+    --orange: #ff8c42;
+    --orange-dark: #b85010;
+    --orange-bg: #2a1a0a;
+
+    --purple: #b388ff;
+    --purple-dark: #6030c0;
+    --purple-bg: #1e1530;
+
+    --blue: #64b5f6;
+    --blue-dark: #1565c0;
+    --blue-bg: #0a1828;
+
+    --font-display: 'Syne', sans-serif;
+    --font-mono: 'Space Mono', monospace;
+    --radius: 6px;
+    --radius-lg: 12px;
+  }
+
+  body {
+    font-family: var(--font-mono);
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 2.5rem 1rem 5rem;
+  }
+
+  /* decorative top stripe */
+  body::before {
+    content: '';
+    display: block;
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--yellow), var(--pink), var(--teal), var(--orange), var(--purple), var(--blue), var(--yellow));
+    background-size: 200%;
+    animation: stripe 6s linear infinite;
+  }
+  @keyframes stripe { to { background-position: 200% 0; } }
+
+  .page { max-width: 800px; margin: 0 auto; }
+
+  header {
+    margin-bottom: 2.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .event-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--yellow);
+    margin-bottom: 8px;
+  }
+
+  h1 {
+    font-family: var(--font-display);
+    font-size: clamp(30px, 6vw, 48px);
+    font-weight: 700;
+    line-height: 1.05;
+    color: var(--text);
+  }
+
+  h1 .cap { color: var(--pink); }
+
+  .header-meta {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 8px;
+  }
+
+  /* Summary cards */
+  .summary {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 2rem;
+  }
+
+  .metric {
+    border-radius: var(--radius-lg);
+    padding: 1.1rem 1.25rem;
+    border: 1px solid;
+  }
+  .metric-total    { background: var(--yellow-bg);  border-color: var(--yellow-dark); }
+  .metric-owed     { background: var(--pink-bg);    border-color: var(--pink-dark); }
+  .metric-settled  { background: var(--teal-bg);    border-color: var(--teal-dark); }
+
+  .metric-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .metric-total .metric-label   { color: var(--yellow); }
+  .metric-owed .metric-label    { color: var(--pink); }
+  .metric-settled .metric-label { color: var(--teal); }
+
+  .metric-value {
+    font-family: var(--font-display);
+    font-size: 30px;
+    font-weight: 700;
+    line-height: 1;
+  }
+  .metric-total .metric-value   { color: var(--yellow); }
+  .metric-owed .metric-value    { color: var(--pink); }
+  .metric-settled .metric-value { color: var(--teal); }
+
+  /* Add form */
+  .add-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+    margin-bottom: 1.75rem;
+  }
+
+  .section-title {
+    font-family: var(--font-display);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--orange);
+    margin-bottom: 1.1rem;
+  }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  .form-grid-2 {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 10px;
+    align-items: flex-end;
+  }
+
+  .field label {
+    display: block;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 5px;
+  }
+
+  input[type="text"],
+  input[type="number"],
+  input[type="date"],
+  select {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 9px 11px;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.15s, background 0.15s;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  input::placeholder { color: var(--text-faint); }
+  input:focus, select:focus {
+    border-color: var(--orange);
+    background: var(--bg);
+  }
+
+  .btn-row { display: flex; gap: 8px; }
+
+  button {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    border-radius: var(--radius);
+    border: 1px solid;
+    padding: 9px 18px;
+    transition: all 0.15s;
+    letter-spacing: 0.06em;
+  }
+
+  .btn-primary {
+    background: var(--orange);
+    color: var(--bg);
+    border-color: var(--orange);
+  }
+  .btn-primary:hover { background: var(--yellow); border-color: var(--yellow); color: var(--bg); }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--text-muted);
+    border-color: var(--border);
+  }
+  .btn-ghost:hover { background: var(--surface2); color: var(--text); }
+
+  /* Table */
+  .table-wrap {
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    table-layout: fixed;
+  }
+
+  thead { background: var(--surface2); }
+
+  th {
+    padding: 10px 12px;
+    text-align: left;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    border-bottom: 1px solid var(--border);
+  }
+
+  th.r, td.r { text-align: right; }
+
+  td {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border-light);
+    color: var(--text);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    background: var(--surface);
+  }
+
+  tr:last-child td { border-bottom: none; }
+  tbody tr:hover td { background: var(--surface2); }
+
+  .col-date { width: 90px; }
+  .col-desc { width: auto; }
+  .col-cat  { width: 125px; }
+  .col-amt  { width: 95px; }
+  .col-stat { width: 95px; }
+  .col-del  { width: 38px; }
+
+  .badge {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 3px;
+    border: 1px solid;
+  }
+
+  .cat-entry         { background: var(--purple-bg);  color: var(--purple); border-color: var(--purple-dark); }
+  .cat-food          { background: var(--teal-bg);    color: var(--teal);   border-color: var(--teal-dark); }
+  .cat-transport     { background: var(--blue-bg);    color: var(--blue);   border-color: var(--blue-dark); }
+  .cat-accommodation { background: var(--yellow-bg);  color: var(--yellow); border-color: var(--yellow-dark); }
+  .cat-gear          { background: var(--orange-bg);  color: var(--orange); border-color: var(--orange-dark); }
+  .cat-other         { background: var(--surface2);   color: var(--text-muted); border-color: var(--border); }
+
+  .status-btn {
+    padding: 3px 9px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    border-radius: 3px;
+    cursor: pointer;
+    border: 1px solid;
+    font-family: var(--font-mono);
+    transition: all 0.15s;
+  }
+  .status-pending { background: var(--pink-bg);  color: var(--pink); border-color: var(--pink-dark); }
+  .status-paid    { background: var(--teal-bg);  color: var(--teal); border-color: var(--teal-dark); }
+  .status-pending:hover { background: var(--pink);  color: var(--bg); border-color: var(--pink); }
+  .status-paid:hover    { background: var(--teal);  color: var(--bg); border-color: var(--teal); }
+
+  .del-btn {
+    background: none;
+    border: none;
+    color: var(--text-faint);
+    font-size: 18px;
+    padding: 2px 4px;
+    cursor: pointer;
+    line-height: 1;
+    transition: color 0.15s;
+  }
+  .del-btn:hover { color: var(--pink); }
+
+  .empty-row td {
+    text-align: center;
+    padding: 3rem;
+    color: var(--text-faint);
+    font-style: italic;
+    font-size: 13px;
+    background: var(--surface);
+  }
+
+  .footer {
+    font-size: 11px;
+    color: var(--text-faint);
+    text-align: center;
+    margin-top: 2rem;
+    letter-spacing: 0.04em;
+  }
+
+  .totals-row td {
+    border-top: 1px solid var(--border);
+    font-weight: 700;
+    background: var(--surface2);
+    color: var(--yellow);
+  }
+
+  @media (max-width: 560px) {
+    .summary { grid-template-columns: 1fr 1fr; }
+    .summary .metric:last-child { grid-column: span 2; }
+    .form-grid { grid-template-columns: 1fr 1fr; }
+    .form-grid .field:first-child { grid-column: span 2; }
+    .col-cat, .col-date { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+  <header>
+    <p class="event-label">// Expense log</p>
+    <h1>Joao's <span class="cap">capoeira</span> event</h1>
+    <p class="header-meta">Track what you paid — click "Pending" to mark items as paid back</p>
+  </header>
+
+  <div class="summary">
+    <div class="metric metric-total">
+      <div class="metric-label">Total paid</div>
+      <div class="metric-value" id="s-total">€0.00</div>
+    </div>
+    <div class="metric metric-owed">
+      <div class="metric-label">Joao owes</div>
+      <div class="metric-value" id="s-owed">€0.00</div>
+    </div>
+    <div class="metric metric-settled">
+      <div class="metric-label">Settled</div>
+      <div class="metric-value" id="s-settled">€0.00</div>
+    </div>
+  </div>
+
+  <div class="add-section">
+    <p class="section-title">Add expense</p>
+    <div class="form-grid">
+      <div class="field"><label>Description</label><input type="text" id="f-desc" placeholder="e.g. Event entry fee" /></div>
+      <div class="field"><label>Amount (€)</label><input type="number" id="f-amt" placeholder="0.00" min="0" step="0.01" /></div>
+      <div class="field"><label>Date</label><input type="date" id="f-date" /></div>
+    </div>
+    <div class="form-grid-2">
+      <div class="field"><label>Category</label>
+        <select id="f-cat">
+          <option value="entry">Entry fee</option>
+          <option value="food">Food &amp; drinks</option>
+          <option value="transport">Transport</option>
+          <option value="accommodation">Accommodation</option>
+          <option value="gear">Gear / equipment</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+      <div class="btn-row">
+        <button class="btn-ghost" onclick="clearForm()">Clear</button>
+        <button class="btn-primary" onclick="addEntry()">+ Add</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="table-section">
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th class="col-date">Date</th>
+            <th class="col-desc">Description</th>
+            <th class="col-cat">Category</th>
+            <th class="col-amt r">Amount</th>
+            <th class="col-stat">Status</th>
+            <th class="col-del"></th>
+          </tr>
+        </thead>
+        <tbody id="expense-list"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <p class="footer">Data saved in your browser · no account needed &nbsp;·&nbsp; <span id="last-saved"></span></p>
+</div>
+
+<script>
+const STORAGE_KEY = 'joao-capoeira-expenses';
+let expenses = [];
+
+const CAT_LABELS = {
+  entry: 'Entry fee',
+  food: 'Food & drinks',
+  transport: 'Transport',
+  accommodation: 'Accommodation',
+  gear: 'Gear',
+  other: 'Other'
+};
+
+function load() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    expenses = raw ? JSON.parse(raw) : [];
+  } catch(e) { expenses = []; }
+}
+
+function save() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(expenses));
+  const now = new Date();
+  document.getElementById('last-saved').textContent =
+    'Last saved ' + now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+}
+
+function today() { return new Date().toISOString().split('T')[0]; }
+
+document.getElementById('f-date').value = today();
+
+function addEntry() {
+  const desc = document.getElementById('f-desc').value.trim();
+  const amt  = parseFloat(document.getElementById('f-amt').value);
+  const date = document.getElementById('f-date').value;
+  const cat  = document.getElementById('f-cat').value;
+  if (!desc)            { alert('Please enter a description.'); return; }
+  if (!amt || amt <= 0) { alert('Please enter a valid amount.'); return; }
+  if (!date)            { alert('Please select a date.'); return; }
+  expenses.push({ id: Date.now(), desc, amt, date, cat, paid: false });
+  expenses.sort((a, b) => b.date.localeCompare(a.date));
+  save(); render(); clearForm();
+}
+
+function clearForm() {
+  document.getElementById('f-desc').value = '';
+  document.getElementById('f-amt').value  = '';
+  document.getElementById('f-date').value = today();
+  document.getElementById('f-cat').value  = 'entry';
+}
+
+function togglePaid(id) {
+  const e = expenses.find(x => x.id === id);
+  if (e) e.paid = !e.paid;
+  save(); render();
+}
+
+function deleteEntry(id) {
+  if (!confirm('Remove this expense?')) return;
+  expenses = expenses.filter(x => x.id !== id);
+  save(); render();
+}
+
+function fmtDate(d) {
+  if (!d) return '';
+  const [y, m, day] = d.split('-');
+  return m + '/' + day + '/' + y.slice(2);
+}
+
+function render() {
+  const tbody = document.getElementById('expense-list');
+
+  if (expenses.length === 0) {
+    tbody.innerHTML = '<tr class="empty-row"><td colspan="6">No expenses yet — add one above</td></tr>';
+    document.getElementById('s-total').textContent   = '€0.00';
+    document.getElementById('s-owed').textContent    = '€0.00';
+    document.getElementById('s-settled').textContent = '€0.00';
+    return;
+  }
+
+  const rows = expenses.map(e => `
+    <tr>
+      <td class="col-date" style="color:var(--text-muted);font-size:12px">${fmtDate(e.date)}</td>
+      <td class="col-desc" title="${e.desc}">${e.desc}</td>
+      <td class="col-cat"><span class="badge cat-${e.cat}">${CAT_LABELS[e.cat] || e.cat}</span></td>
+      <td class="col-amt r" style="font-weight:700">€${e.amt.toFixed(2)}</td>
+      <td class="col-stat">
+        <button class="status-btn ${e.paid ? 'status-paid' : 'status-pending'}" onclick="togglePaid(${e.id})">
+          ${e.paid ? '✓ Paid' : 'Pending'}
+        </button>
+      </td>
+      <td class="col-del"><button class="del-btn" onclick="deleteEntry(${e.id})" title="Delete">×</button></td>
+    </tr>
+  `).join('');
+
+  const total   = expenses.reduce((s, e) => s + e.amt, 0);
+  const settled = expenses.filter(e => e.paid).reduce((s, e) => s + e.amt, 0);
+  const pending = expenses.filter(e => !e.paid).reduce((s, e) => s + e.amt, 0);
+
+  tbody.innerHTML = rows + `
+    <tr class="totals-row">
+      <td class="col-date"></td>
+      <td class="col-desc" style="font-size:10px;letter-spacing:.1em;text-transform:uppercase">Total</td>
+      <td class="col-cat"></td>
+      <td class="col-amt r">€${total.toFixed(2)}</td>
+      <td class="col-stat"></td>
+      <td class="col-del"></td>
+    </tr>
+  `;
+
+  document.getElementById('s-total').textContent   = '€' + total.toFixed(2);
+  document.getElementById('s-owed').textContent    = '€' + pending.toFixed(2);
+  document.getElementById('s-settled').textContent = '€' + settled.toFixed(2);
+}
+
+load(); render();
+if (expenses.length > 0) {
+  document.getElementById('last-saved').textContent = 'Data loaded from browser storage';
+}
+</script>
+</body>
+</html>
