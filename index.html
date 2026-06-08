@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Joao Expenses</title>
+<title>Joao's Capoeira Event — Expenses</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" />
@@ -19,31 +19,25 @@
     --text: #fffffe;
     --text-muted: #a09dc0;
     --text-faint: #5a5778;
-
     --yellow: #f9c846;
     --yellow-dark: #b8920a;
     --yellow-bg: #2a2410;
-
     --pink: #ff6b9d;
     --pink-dark: #c0326a;
     --pink-bg: #2a1020;
-
     --teal: #43ffdd;
     --teal-dark: #0a9e80;
     --teal-bg: #0a2420;
-
     --orange: #ff8c42;
     --orange-dark: #b85010;
     --orange-bg: #2a1a0a;
-
     --purple: #b388ff;
     --purple-dark: #6030c0;
     --purple-bg: #1e1530;
-
     --blue: #64b5f6;
     --blue-dark: #1565c0;
     --blue-bg: #0a1828;
-
+    --gray-light: #2a2840;
     --font-display: 'Syne', sans-serif;
     --font-mono: 'Space Mono', monospace;
     --radius: 6px;
@@ -58,7 +52,6 @@
     padding: 2.5rem 1rem 5rem;
   }
 
-  /* decorative top stripe */
   body::before {
     content: '';
     display: block;
@@ -68,6 +61,7 @@
     background: linear-gradient(90deg, var(--yellow), var(--pink), var(--teal), var(--orange), var(--purple), var(--blue), var(--yellow));
     background-size: 200%;
     animation: stripe 6s linear infinite;
+    z-index: 100;
   }
   @keyframes stripe { to { background-position: 200% 0; } }
 
@@ -96,16 +90,30 @@
     line-height: 1.05;
     color: var(--text);
   }
-
   h1 .cap { color: var(--pink); }
 
   .header-meta {
     font-size: 11px;
     color: var(--text-muted);
     margin-top: 8px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
   }
 
-  /* Summary cards */
+  .sync-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--text-faint);
+    display: inline-block;
+    flex-shrink: 0;
+    transition: background 0.3s;
+  }
+  .sync-dot.syncing  { background: var(--yellow); animation: pulse 1s infinite; }
+  .sync-dot.synced   { background: var(--teal); }
+  .sync-dot.error    { background: var(--pink); }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
   .summary {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -118,9 +126,9 @@
     padding: 1.1rem 1.25rem;
     border: 1px solid;
   }
-  .metric-total    { background: var(--yellow-bg);  border-color: var(--yellow-dark); }
-  .metric-owed     { background: var(--pink-bg);    border-color: var(--pink-dark); }
-  .metric-settled  { background: var(--teal-bg);    border-color: var(--teal-dark); }
+  .metric-total    { background: var(--yellow-bg); border-color: var(--yellow-dark); }
+  .metric-owed     { background: var(--pink-bg);   border-color: var(--pink-dark); }
+  .metric-settled  { background: var(--teal-bg);   border-color: var(--teal-dark); }
 
   .metric-label {
     font-size: 10px;
@@ -143,7 +151,6 @@
   .metric-owed .metric-value    { color: var(--pink); }
   .metric-settled .metric-value { color: var(--teal); }
 
-  /* Add form */
   .add-section {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -204,10 +211,7 @@
     appearance: none;
   }
   input::placeholder { color: var(--text-faint); }
-  input:focus, select:focus {
-    border-color: var(--orange);
-    background: var(--bg);
-  }
+  input:focus, select:focus { border-color: var(--orange); background: var(--bg); }
 
   .btn-row { display: flex; gap: 8px; }
 
@@ -223,21 +227,13 @@
     letter-spacing: 0.06em;
   }
 
-  .btn-primary {
-    background: var(--orange);
-    color: var(--bg);
-    border-color: var(--orange);
-  }
+  .btn-primary { background: var(--orange); color: var(--bg); border-color: var(--orange); }
   .btn-primary:hover { background: var(--yellow); border-color: var(--yellow); color: var(--bg); }
+  .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
 
-  .btn-ghost {
-    background: transparent;
-    color: var(--text-muted);
-    border-color: var(--border);
-  }
+  .btn-ghost { background: transparent; color: var(--text-muted); border-color: var(--border); }
   .btn-ghost:hover { background: var(--surface2); color: var(--text); }
 
-  /* Table */
   .table-wrap {
     border: 1px solid var(--border);
     border-radius: var(--radius-lg);
@@ -263,7 +259,6 @@
     color: var(--text-muted);
     border-bottom: 1px solid var(--border);
   }
-
   th.r, td.r { text-align: right; }
 
   td {
@@ -275,7 +270,6 @@
     white-space: nowrap;
     background: var(--surface);
   }
-
   tr:last-child td { border-bottom: none; }
   tbody tr:hover td { background: var(--surface2); }
 
@@ -296,13 +290,12 @@
     border-radius: 3px;
     border: 1px solid;
   }
-
-  .cat-entry         { background: var(--purple-bg);  color: var(--purple); border-color: var(--purple-dark); }
-  .cat-food          { background: var(--teal-bg);    color: var(--teal);   border-color: var(--teal-dark); }
-  .cat-transport     { background: var(--blue-bg);    color: var(--blue);   border-color: var(--blue-dark); }
-  .cat-accommodation { background: var(--yellow-bg);  color: var(--yellow); border-color: var(--yellow-dark); }
-  .cat-gear          { background: var(--orange-bg);  color: var(--orange); border-color: var(--orange-dark); }
-  .cat-other         { background: var(--surface2);   color: var(--text-muted); border-color: var(--border); }
+  .cat-entry         { background: var(--purple-bg); color: var(--purple); border-color: var(--purple-dark); }
+  .cat-food          { background: var(--teal-bg);   color: var(--teal);   border-color: var(--teal-dark); }
+  .cat-transport     { background: var(--blue-bg);   color: var(--blue);   border-color: var(--blue-dark); }
+  .cat-accommodation { background: var(--yellow-bg); color: var(--yellow); border-color: var(--yellow-dark); }
+  .cat-gear          { background: var(--orange-bg); color: var(--orange); border-color: var(--orange-dark); }
+  .cat-other         { background: var(--gray-light);color: var(--text-muted); border-color: var(--border); }
 
   .status-btn {
     padding: 3px 9px;
@@ -316,10 +309,10 @@
     font-family: var(--font-mono);
     transition: all 0.15s;
   }
-  .status-pending { background: var(--pink-bg);  color: var(--pink); border-color: var(--pink-dark); }
-  .status-paid    { background: var(--teal-bg);  color: var(--teal); border-color: var(--teal-dark); }
-  .status-pending:hover { background: var(--pink);  color: var(--bg); border-color: var(--pink); }
-  .status-paid:hover    { background: var(--teal);  color: var(--bg); border-color: var(--teal); }
+  .status-pending { background: var(--pink-bg); color: var(--pink); border-color: var(--pink-dark); }
+  .status-paid    { background: var(--teal-bg); color: var(--teal); border-color: var(--teal-dark); }
+  .status-pending:hover { background: var(--pink); color: var(--bg); border-color: var(--pink); }
+  .status-paid:hover    { background: var(--teal); color: var(--bg); border-color: var(--teal); }
 
   .del-btn {
     background: none;
@@ -357,6 +350,29 @@
     color: var(--yellow);
   }
 
+  .loading-overlay {
+    position: fixed;
+    inset: 0;
+    background: var(--bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 16px;
+    z-index: 50;
+    transition: opacity 0.4s;
+  }
+  .loading-overlay.hidden { opacity: 0; pointer-events: none; }
+  .loading-spinner {
+    width: 36px; height: 36px;
+    border: 3px solid var(--border);
+    border-top-color: var(--orange);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loading-text { color: var(--text-muted); font-size: 13px; letter-spacing: 0.08em; }
+
   @media (max-width: 560px) {
     .summary { grid-template-columns: 1fr 1fr; }
     .summary .metric:last-child { grid-column: span 2; }
@@ -367,11 +383,20 @@
 </style>
 </head>
 <body>
+
+<div class="loading-overlay" id="loading">
+  <div class="loading-spinner"></div>
+  <div class="loading-text">Connecting to Firebase...</div>
+</div>
+
 <div class="page">
   <header>
     <p class="event-label">// Expense log</p>
     <h1>Joao's <span class="cap">capoeira</span> event</h1>
-    <p class="header-meta">Track what you paid — click "Pending" to mark items as paid back</p>
+    <p class="header-meta">
+      <span class="sync-dot" id="sync-dot"></span>
+      <span id="sync-status">Connecting...</span>
+    </p>
   </header>
 
   <div class="summary">
@@ -409,7 +434,7 @@
       </div>
       <div class="btn-row">
         <button class="btn-ghost" onclick="clearForm()">Clear</button>
-        <button class="btn-primary" onclick="addEntry()">+ Add</button>
+        <button class="btn-primary" id="btn-add" onclick="addEntry()">+ Add</button>
       </div>
     </div>
   </div>
@@ -432,128 +457,156 @@
     </div>
   </div>
 
-  <p class="footer">Data saved in your browser · no account needed &nbsp;·&nbsp; <span id="last-saved"></span></p>
+  <p class="footer">Synced with Firebase · updates on all devices in real time</p>
 </div>
 
-<script>
-const STORAGE_KEY = 'joao-capoeira-expenses';
-let expenses = [];
+<!-- Firebase SDK -->
+<script type="module">
+  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+  import { getDatabase, ref, push, update, remove, onValue } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
 
-const CAT_LABELS = {
-  entry: 'Entry fee',
-  food: 'Food & drinks',
-  transport: 'Transport',
-  accommodation: 'Accommodation',
-  gear: 'Gear',
-  other: 'Other'
-};
+  const firebaseConfig = {
+    apiKey: "AIzaSyDAb10xQOiyLuDXRqOrT93SS3FWLsUzQfQ",
+    authDomain: "joao-expenses.firebaseapp.com",
+    databaseURL: "https://joao-expenses-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "joao-expenses",
+    storageBucket: "joao-expenses.firebasestorage.app",
+    messagingSenderId: "936297862127",
+    appId: "1:936297862127:web:e6450750891bd61578dc1a"
+  };
 
-function load() {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    expenses = raw ? JSON.parse(raw) : [];
-  } catch(e) { expenses = []; }
-}
+  const app = initializeApp(firebaseConfig);
+  const db  = getDatabase(app);
+  const expensesRef = ref(db, 'expenses');
 
-function save() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(expenses));
-  const now = new Date();
-  document.getElementById('last-saved').textContent =
-    'Last saved ' + now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
-}
+  const CAT_LABELS = {
+    entry: 'Entry fee', food: 'Food & drinks', transport: 'Transport',
+    accommodation: 'Accommodation', gear: 'Gear', other: 'Other'
+  };
 
-function today() { return new Date().toISOString().split('T')[0]; }
-
-document.getElementById('f-date').value = today();
-
-function addEntry() {
-  const desc = document.getElementById('f-desc').value.trim();
-  const amt  = parseFloat(document.getElementById('f-amt').value);
-  const date = document.getElementById('f-date').value;
-  const cat  = document.getElementById('f-cat').value;
-  if (!desc)            { alert('Please enter a description.'); return; }
-  if (!amt || amt <= 0) { alert('Please enter a valid amount.'); return; }
-  if (!date)            { alert('Please select a date.'); return; }
-  expenses.push({ id: Date.now(), desc, amt, date, cat, paid: false });
-  expenses.sort((a, b) => b.date.localeCompare(a.date));
-  save(); render(); clearForm();
-}
-
-function clearForm() {
-  document.getElementById('f-desc').value = '';
-  document.getElementById('f-amt').value  = '';
-  document.getElementById('f-date').value = today();
-  document.getElementById('f-cat').value  = 'entry';
-}
-
-function togglePaid(id) {
-  const e = expenses.find(x => x.id === id);
-  if (e) e.paid = !e.paid;
-  save(); render();
-}
-
-function deleteEntry(id) {
-  if (!confirm('Remove this expense?')) return;
-  expenses = expenses.filter(x => x.id !== id);
-  save(); render();
-}
-
-function fmtDate(d) {
-  if (!d) return '';
-  const [y, m, day] = d.split('-');
-  return m + '/' + day + '/' + y.slice(2);
-}
-
-function render() {
-  const tbody = document.getElementById('expense-list');
-
-  if (expenses.length === 0) {
-    tbody.innerHTML = '<tr class="empty-row"><td colspan="6">No expenses yet — add one above</td></tr>';
-    document.getElementById('s-total').textContent   = '€0.00';
-    document.getElementById('s-owed').textContent    = '€0.00';
-    document.getElementById('s-settled').textContent = '€0.00';
-    return;
+  function setSyncStatus(state, msg) {
+    const dot = document.getElementById('sync-dot');
+    const txt = document.getElementById('sync-status');
+    dot.className = 'sync-dot ' + state;
+    txt.textContent = msg;
   }
 
-  const rows = expenses.map(e => `
-    <tr>
-      <td class="col-date" style="color:var(--text-muted);font-size:12px">${fmtDate(e.date)}</td>
-      <td class="col-desc" title="${e.desc}">${e.desc}</td>
-      <td class="col-cat"><span class="badge cat-${e.cat}">${CAT_LABELS[e.cat] || e.cat}</span></td>
-      <td class="col-amt r" style="font-weight:700">€${e.amt.toFixed(2)}</td>
-      <td class="col-stat">
-        <button class="status-btn ${e.paid ? 'status-paid' : 'status-pending'}" onclick="togglePaid(${e.id})">
-          ${e.paid ? '✓ Paid' : 'Pending'}
-        </button>
-      </td>
-      <td class="col-del"><button class="del-btn" onclick="deleteEntry(${e.id})" title="Delete">×</button></td>
-    </tr>
-  `).join('');
+  function today() { return new Date().toISOString().split('T')[0]; }
+  document.getElementById('f-date').value = today();
 
-  const total   = expenses.reduce((s, e) => s + e.amt, 0);
-  const settled = expenses.filter(e => e.paid).reduce((s, e) => s + e.amt, 0);
-  const pending = expenses.filter(e => !e.paid).reduce((s, e) => s + e.amt, 0);
+  // Listen for real-time updates
+  onValue(expensesRef, (snapshot) => {
+    const data = snapshot.val() || {};
+    const expenses = Object.entries(data).map(([id, v]) => ({ id, ...v }));
+    expenses.sort((a, b) => b.date.localeCompare(a.date));
+    render(expenses);
+    setSyncStatus('synced', 'Synced · live');
+    document.getElementById('loading').classList.add('hidden');
+  }, (error) => {
+    setSyncStatus('error', 'Connection error');
+    document.getElementById('loading').classList.add('hidden');
+  });
 
-  tbody.innerHTML = rows + `
-    <tr class="totals-row">
-      <td class="col-date"></td>
-      <td class="col-desc" style="font-size:10px;letter-spacing:.1em;text-transform:uppercase">Total</td>
-      <td class="col-cat"></td>
-      <td class="col-amt r">€${total.toFixed(2)}</td>
-      <td class="col-stat"></td>
-      <td class="col-del"></td>
-    </tr>
-  `;
+  window.addEntry = async function() {
+    const desc = document.getElementById('f-desc').value.trim();
+    const amt  = parseFloat(document.getElementById('f-amt').value);
+    const date = document.getElementById('f-date').value;
+    const cat  = document.getElementById('f-cat').value;
+    if (!desc)            { alert('Please enter a description.'); return; }
+    if (!amt || amt <= 0) { alert('Please enter a valid amount.'); return; }
+    if (!date)            { alert('Please select a date.'); return; }
 
-  document.getElementById('s-total').textContent   = '€' + total.toFixed(2);
-  document.getElementById('s-owed').textContent    = '€' + pending.toFixed(2);
-  document.getElementById('s-settled').textContent = '€' + settled.toFixed(2);
-}
+    const btn = document.getElementById('btn-add');
+    btn.disabled = true;
+    setSyncStatus('syncing', 'Saving...');
+    try {
+      await push(expensesRef, { desc, amt, date, cat, paid: false });
+      clearForm();
+    } catch(e) {
+      alert('Error saving. Check your connection.');
+      setSyncStatus('error', 'Save failed');
+    }
+    btn.disabled = false;
+  };
 
-load(); render();
-if (expenses.length > 0) {
-  document.getElementById('last-saved').textContent = 'Data loaded from browser storage';
-}
+  window.clearForm = function() {
+    document.getElementById('f-desc').value = '';
+    document.getElementById('f-amt').value  = '';
+    document.getElementById('f-date').value = today();
+    document.getElementById('f-cat').value  = 'entry';
+  };
+
+  window.togglePaid = async function(id, currentPaid) {
+    setSyncStatus('syncing', 'Saving...');
+    try {
+      await update(ref(db, 'expenses/' + id), { paid: !currentPaid });
+    } catch(e) {
+      setSyncStatus('error', 'Update failed');
+    }
+  };
+
+  window.deleteEntry = async function(id) {
+    if (!confirm('Remove this expense?')) return;
+    setSyncStatus('syncing', 'Deleting...');
+    try {
+      await remove(ref(db, 'expenses/' + id));
+    } catch(e) {
+      setSyncStatus('error', 'Delete failed');
+    }
+  };
+
+  function fmtDate(d) {
+    if (!d) return '';
+    const [y, m, day] = d.split('-');
+    return m + '/' + day + '/' + y.slice(2);
+  }
+
+  function render(expenses) {
+    const tbody = document.getElementById('expense-list');
+
+    if (expenses.length === 0) {
+      tbody.innerHTML = '<tr class="empty-row"><td colspan="6">No expenses yet — add one above</td></tr>';
+      document.getElementById('s-total').textContent   = '€0.00';
+      document.getElementById('s-owed').textContent    = '€0.00';
+      document.getElementById('s-settled').textContent = '€0.00';
+      return;
+    }
+
+    const rows = expenses.map(e => `
+      <tr>
+        <td class="col-date" style="color:var(--text-muted);font-size:12px">${fmtDate(e.date)}</td>
+        <td class="col-desc" title="${e.desc}">${e.desc}</td>
+        <td class="col-cat"><span class="badge cat-${e.cat}">${CAT_LABELS[e.cat] || e.cat}</span></td>
+        <td class="col-amt r" style="font-weight:700">€${e.amt.toFixed(2)}</td>
+        <td class="col-stat">
+          <button class="status-btn ${e.paid ? 'status-paid' : 'status-pending'}"
+                  onclick="togglePaid('${e.id}', ${e.paid})">
+            ${e.paid ? '✓ Paid' : 'Pending'}
+          </button>
+        </td>
+        <td class="col-del"><button class="del-btn" onclick="deleteEntry('${e.id}')" title="Delete">×</button></td>
+      </tr>
+    `).join('');
+
+    const total   = expenses.reduce((s, e) => s + e.amt, 0);
+    const settled = expenses.filter(e => e.paid).reduce((s, e) => s + e.amt, 0);
+    const pending = expenses.filter(e => !e.paid).reduce((s, e) => s + e.amt, 0);
+
+    tbody.innerHTML = rows + `
+      <tr class="totals-row">
+        <td class="col-date"></td>
+        <td class="col-desc" style="font-size:10px;letter-spacing:.1em;text-transform:uppercase">Total</td>
+        <td class="col-cat"></td>
+        <td class="col-amt r">€${total.toFixed(2)}</td>
+        <td class="col-stat"></td>
+        <td class="col-del"></td>
+      </tr>
+    `;
+
+    document.getElementById('s-total').textContent   = '€' + total.toFixed(2);
+    document.getElementById('s-owed').textContent    = '€' + pending.toFixed(2);
+    document.getElementById('s-settled').textContent = '€' + settled.toFixed(2);
+  }
 </script>
 </body>
 </html>
